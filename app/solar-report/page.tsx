@@ -2,10 +2,12 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+// 1. We import your new accurate subsidy math here
+import { calculateSubsidy } from '../utils/subsidy'; 
 
 export default function SolarReport() {
   const [roofArea, setRoofArea] = useState(850);
-  const [capacity, setCapacity] = useState(8.5);
+  const [capacity, setCapacity] = useState(8.5); // "capacity" is your kW variable
   const router = useRouter();
 
   useEffect(() => {
@@ -20,20 +22,14 @@ export default function SolarReport() {
     }
   }, []);
 
-  const calculateSubsidy = (kw: number) => {
-    if (kw <= 2) return kw * 30000;
-    if (kw <= 3) return 60000 + ((kw - 2) * 18000);
-    return 78000; 
-  };
-
   const totalCost = capacity * 60000; 
-  const subsidy = calculateSubsidy(capacity);
+  // 2. We pass your 'capacity' variable into the new function here
+  const subsidy = calculateSubsidy(capacity); 
   const netPayable = totalCost - subsidy;
   const monthlySavings = capacity * 960; 
   const paybackYears = netPayable / (monthlySavings * 12);
 
   const handleFindInstallers = () => {
-    // Save the required capacity so the installers page can read it
     localStorage.setItem('requiredCapacity', capacity.toString());
     router.push('/installers');
   };
@@ -94,6 +90,7 @@ export default function SolarReport() {
                 <span className="font-medium text-gray-600">PM Surya Ghar Subsidy</span>
                 <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full">Govt Scheme</span>
               </div>
+              {/* 3. The calculated format is injected here automatically */}
               <span className="font-bold text-green-600">- ₹{subsidy.toLocaleString('en-IN')}</span>
             </div>
             
@@ -114,7 +111,6 @@ export default function SolarReport() {
               </div>
             </div>
 
-            {/* NEW BUTTON ADDED HERE */}
             <button 
               onClick={handleFindInstallers}
               className="w-full bg-gray-900 hover:bg-gray-800 text-white font-bold py-4 rounded-xl transition text-lg shadow-md mt-auto flex items-center justify-center gap-2"

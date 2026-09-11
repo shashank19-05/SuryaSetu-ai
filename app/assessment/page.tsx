@@ -19,6 +19,9 @@ export default function Assessment() {
   const [progress, setProgress] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
+  // NEW: Dedicated state for the bill document scanner
+  const [isBillScanning, setIsBillScanning] = useState(false);
+  
   const router = useRouter();
 
   const handleLocate = (e: React.FormEvent) => {
@@ -74,15 +77,28 @@ export default function Assessment() {
     }, 100);
   };
 
+  // NEW: Handler for the AI Bill Upload animation
+  const handleBillUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setBillFile(e.target.files[0]);
+      setIsBillScanning(true);
+      
+      // Simulate AI OCR processing time
+      setTimeout(() => {
+        setIsBillScanning(false);
+        // Auto-fill the bill amount for a great demo effect!
+        if (!billAmount) setBillAmount('1500'); 
+      }, 3000); 
+    }
+  };
+
   const handleAnalyze = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     
     try {
-      // 1. Always save to local storage as a backup so the next page has data immediately
       localStorage.setItem('solarData', JSON.stringify({ bill: billAmount, area: roofArea }));
 
-      // 2. Fire-and-forget Firebase save (Removed the 'await' so it doesn't block the UI)
       if (auth.currentUser) {
         addDoc(collection(db, 'assessments'), {
           uid: auth.currentUser.uid,
@@ -93,14 +109,12 @@ export default function Assessment() {
         }).catch(err => console.error("Firebase background save issue:", err));
       }
       
-      // 3. Instantly navigate to the report page for a flawless demo
       router.push('/solar-report');
       
     } catch (error) {
       console.error("Error routing to report:", error);
       router.push('/solar-report');
     } finally {
-      // Reset the button state just in case the routing takes a second
       setTimeout(() => setIsSubmitting(false), 1000);
     }
   };
@@ -223,13 +237,41 @@ export default function Assessment() {
             </div>
           </div>
 
+          {/* NEW AI BILL SCANNER UI INTEGRATED HERE */}
           <div className="mb-8">
-             <label className="border-2 border-dashed border-gray-300 rounded-xl p-6 flex flex-col items-center justify-center cursor-pointer hover:border-orange-500 hover:bg-orange-50 transition w-full">
-                <span className="text-3xl mb-2">📄</span>
-                <span className="text-sm font-semibold text-gray-700">Upload Electricity Bill (Optional for Demo)</span>
-                <span className="text-xs text-gray-400 mt-1">{billFile ? billFile.name : 'PDF, JPG, or PNG'}</span>
-                <input type="file" className="hidden" onChange={(e) => setBillFile(e.target.files?.[0] || null)} />
-              </label>
+            <label 
+              className={`relative flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-xl cursor-pointer transition-all duration-300 ${
+                isBillScanning ? 'border-orange-500 bg-orange-50' : 'border-gray-300 bg-gray-50 hover:bg-gray-100'
+              }`}
+            >
+              <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
+                {isBillScanning ? (
+                  <div className="flex flex-col items-center">
+                    <div className="w-12 h-12 mb-4 text-orange-500 animate-pulse">
+                      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    </div>
+                    <p className="text-sm text-orange-600 font-semibold animate-pulse">Running AI OCR... Extracting Usage Data</p>
+                  </div>
+                ) : (
+                  <>
+                    {billFile ? (
+                      <>
+                        <span className="text-4xl mb-3">✅</span>
+                        <p className="mb-2 text-sm text-green-600 font-bold">Successfully Scanned: {billFile.name}</p>
+                        <p className="text-xs text-gray-500">Click to upload a different file</p>
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-10 h-10 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                        <p className="mb-2 text-sm text-gray-500"><span className="font-semibold">Click to upload</span> your latest electricity bill</p>
+                        <p className="text-xs text-gray-500">PDF, PNG, or JPG</p>
+                      </>
+                    )}
+                  </>
+                )}
+              </div>
+              <input type="file" className="hidden" onChange={handleBillUpload} accept=".pdf,.png,.jpg,.jpeg" disabled={isBillScanning} />
+            </label>
           </div>
 
           <button 
