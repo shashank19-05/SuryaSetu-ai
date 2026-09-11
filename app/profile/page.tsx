@@ -1,17 +1,41 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { auth, db } from '../../firebase';
+import { onAuthStateChanged } from 'firebase/auth';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 
 export default function Profile() {
-  // We will connect this to Firebase later tonight, using dummy data for now
-  const [user, setUser] = useState({ name: 'Demo User', email: 'demo@suryasetu.ai', phone: '+91 98765 43210' });
+  const [user, setUser] = useState<{name: string, email: string} | null>(null);
   const [savedReport, setSavedReport] = useState<{bill: number, area: number} | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
-    // Pulls the calculation Kesav's assessment page saves
-    const data = localStorage.getItem('solarData');
-    if (data) setSavedReport(JSON.parse(data));
-  }, []);
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (currentUser) {
+        setUser({ 
+          name: currentUser.email?.split('@')[0] || 'Solar User', 
+          email: currentUser.email || '' 
+        });
+
+        // Pull the user's specific assessment from Firestore
+        const q = query(collection(db, 'assessments'), where("uid", "==", currentUser.uid));
+        const querySnapshot = await getDocs(q);
+        
+        if (!querySnapshot.empty) {
+          const data = querySnapshot.docs[0].data();
+          setSavedReport({ bill: data.bill, area: data.area });
+        }
+      } else {
+        router.push('/login'); // Kick them out if not logged in
+      }
+    });
+
+    return () => unsubscribe();
+  }, [router]);
+
+  if (!user) return <div className="min-h-screen flex items-center justify-center">Loading Profile...</div>;
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
@@ -23,19 +47,15 @@ export default function Profile() {
         
         <div className="bg-white rounded-2xl shadow-sm p-8 mb-8 border border-gray-100">
           <div className="flex items-center gap-6 mb-8">
-            <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 text-3xl font-bold">
+            <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 text-3xl font-bold uppercase">
               {user.name.charAt(0)}
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-gray-800">{user.name}</h2>
+              <h2 className="text-2xl font-bold text-gray-800 capitalize">{user.name}</h2>
               <p className="text-gray-500">{user.email}</p>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <div className="border border-gray-100 bg-gray-50 p-4 rounded-xl">
-              <div className="text-sm text-gray-500 mb-1">Phone Number</div>
-              <div className="font-semibold text-gray-800">{user.phone}</div>
-            </div>
             <div className="border border-gray-100 bg-gray-50 p-4 rounded-xl">
               <div className="text-sm text-gray-500 mb-1">Account Status</div>
               <div className="font-semibold text-green-600 flex items-center gap-2">
@@ -45,7 +65,7 @@ export default function Profile() {
           </div>
         </div>
 
-        <h3 className="text-xl font-bold text-gray-800 mb-4">Saved Assessments</h3>
+        <h3 className="text-xl font-bold text-gray-800 mb-4">Saved Cloud Assessments</h3>
         {savedReport ? (
           <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 flex justify-between items-center hover:shadow-md transition">
             <div>
