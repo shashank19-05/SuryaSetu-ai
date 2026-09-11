@@ -59,7 +59,7 @@ export default function Login() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-orange-500"
+              className="w-full border border-gray-300 rounded-lg p-3 text-gray-900 bg-white outline-none focus:ring-2 focus:ring-orange-500"
               placeholder="you@example.com"
             />
           </div>
@@ -70,7 +70,7 @@ export default function Login() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-orange-500"
+              className="w-full border border-gray-300 rounded-lg p-3 text-gray-900 bg-white outline-none focus:ring-2 focus:ring-orange-500"
               placeholder="••••••••"
             />
           </div>
@@ -87,6 +87,7 @@ export default function Login() {
         <div className="mt-6 text-center text-sm text-gray-500">
           {isLogin ? "Don't have an account? " : "Already have an account? "}
           <button
+            type="button"
             onClick={() => setIsLogin(!isLogin)}
             className="text-orange-500 font-bold hover:underline"
           >
