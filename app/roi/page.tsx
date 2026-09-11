@@ -1,55 +1,97 @@
-'use client'
-import { useEffect, useState } from 'react'
-import Link from 'next/link'
+'use client';
+import { useState } from 'react';
+import Link from 'next/link';
 
-export default function ROI() {
-  const [roi, setRoi] = useState({cost:0, savings:0, payback:0, subsidy:0, netCost:0})
+export default function ROICalculator() {
+  const [capacity, setCapacity] = useState<number>(3); // Default 3kW
+  const costPerKW = 60000; // Average cost ₹60,000 per kW
 
-  useEffect(() => {
-    const saved = localStorage.getItem('assessment')
-    if (saved) {
-      const a = JSON.parse(saved)
-      const areaM2 = parseFloat(a.roofArea) * 0.0929
-      const kw = +(areaM2 * 0.15 * 5.3 / 5.3).toFixed(1)
-      const cost = Math.round(kw * 45000)
-      const savings = Math.round(areaM2 * 0.15 * 5.3 * 365 * 7)
-      const subsidy = kw <= 3 ? kw * 30000 : (3 * 30000) + ((kw - 3) * 18000)
-      const netCost = cost - subsidy
-      const payback = +(netCost / savings).toFixed(1)
-      setRoi({cost, savings, payback, subsidy: Math.round(subsidy), netCost: Math.round(netCost)})
-    }
-  }, [])
+  // Real PM Surya Ghar Scheme Math
+  const calculateSubsidy = (kw: number) => {
+    if (kw <= 2) return kw * 30000;
+    if (kw > 2 && kw <= 3) return (2 * 30000) + ((kw - 2) * 18000);
+    return 78000; // Capped at 78,000 for > 3kW
+  };
+
+  const totalCost = capacity * costPerKW;
+  const subsidyAmount = calculateSubsidy(capacity);
+  const netCost = totalCost - subsidyAmount;
+  
+  // Assuming 1kW generates ~120 units/month, saving ₹8 per unit
+  const monthlySavings = capacity * 120 * 8;
+  const paybackMonths = netCost / monthlySavings;
+  const paybackYears = (paybackMonths / 12).toFixed(1);
 
   return (
-    <div style={{minHeight:'100vh', background:'#f8fafc'}}>
-      <div style={{background:'white', padding:'16px 32px', boxShadow:'0 1px 4px rgba(0,0,0,0.1)', display:'flex', justifyContent:'space-between'}}>
-        <div style={{fontWeight:'bold', color:'#F97316', fontSize:'20px'}}>☀️ Surya Setu AI</div>
-        <Link href="/solar-report"><button style={{color:'#6b7280', background:'none', border:'none', cursor:'pointer'}}>← Back</button></Link>
-      </div>
+    <div className="min-h-screen bg-gray-50 p-8">
+      <div className="max-w-4xl mx-auto">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">ROI & Subsidy Calculator 💰</h1>
+          <Link href="/dashboard">
+            <button className="text-orange-500 font-semibold hover:text-orange-700 transition">← Back</button>
+          </Link>
+        </div>
 
-      <div style={{maxWidth:'600px', margin:'0 auto', padding:'40px 16px'}}>
-        <h1 style={{fontSize:'28px', fontWeight:'bold', color:'#1f2937', marginBottom:'8px'}}>💰 ROI Calculator</h1>
-        <p style={{color:'#6b7280', marginBottom:'32px'}}>Your complete financial breakdown</p>
-
-        {[
-          {label:'Total System Cost', value:`₹${roi.cost.toLocaleString()}`, color:'#FEE2E2'},
-          {label:'Government Subsidy (PM Surya Ghar)', value:`- ₹${roi.subsidy.toLocaleString()}`, color:'#D1FAE5'},
-          {label:'Your Net Cost', value:`₹${roi.netCost.toLocaleString()}`, color:'#DBEAFE'},
-          {label:'Annual Savings', value:`₹${roi.savings.toLocaleString()}`, color:'#FEF3C7'},
-          {label:'Payback Period', value:`${roi.payback} years`, color:'#F3E8FF'},
-        ].map((item,i) => (
-          <div key={i} style={{background:item.color, borderRadius:'12px', padding:'20px 24px', marginBottom:'12px', display:'flex', justifyContent:'space-between', alignItems:'center'}}>
-            <span style={{color:'#374151', fontWeight:'500'}}>{item.label}</span>
-            <span style={{fontWeight:'bold', fontSize:'18px', color:'#1f2937'}}>{item.value}</span>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          
+          {/* Input Section */}
+          <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 col-span-1">
+            <h3 className="text-lg font-bold text-gray-800 mb-4">System Size</h3>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Capacity (kW)</label>
+            <input 
+              type="range" 
+              min="1" 
+              max="10" 
+              step="0.5"
+              value={capacity}
+              onChange={(e) => setCapacity(Number(e.target.value))}
+              className="w-full h-2 bg-orange-200 rounded-lg appearance-none cursor-pointer accent-orange-600 mb-4"
+            />
+            <div className="text-center font-bold text-2xl text-orange-600">
+              {capacity} kW
+            </div>
+            <p className="text-xs text-gray-500 text-center mt-2">
+              Suitable for {capacity * 100} sq.ft roof area
+            </p>
           </div>
-        ))}
 
-        <Link href="/subsidy">
-          <button style={{width:'100%', background:'#F97316', color:'white', fontWeight:'600', padding:'16px', borderRadius:'12px', border:'none', cursor:'pointer', fontSize:'16px', marginTop:'16px'}}>
-            Check Subsidies →
-          </button>
-        </Link>
+          {/* Results Section */}
+          <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 col-span-1 md:col-span-2">
+            <h3 className="text-lg font-bold text-gray-800 mb-6">Financial Breakdown</h3>
+            
+            <div className="space-y-4">
+              <div className="flex justify-between items-center pb-4 border-b border-gray-100">
+                <span className="text-gray-600">Estimated Total Cost</span>
+                <span className="font-semibold text-gray-800">₹{totalCost.toLocaleString('en-IN')}</span>
+              </div>
+              
+              <div className="flex justify-between items-center pb-4 border-b border-gray-100">
+                <span className="text-gray-600 flex items-center gap-2">
+                  PM Surya Ghar Subsidy <span className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">Govt Scheme</span>
+                </span>
+                <span className="font-bold text-green-600">- ₹{subsidyAmount.toLocaleString('en-IN')}</span>
+              </div>
+
+              <div className="flex justify-between items-center pt-2">
+                <span className="text-lg font-bold text-gray-800">Net Payable Amount</span>
+                <span className="text-2xl font-bold text-orange-600">₹{netCost.toLocaleString('en-IN')}</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 mt-8">
+              <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 text-center">
+                <div className="text-sm text-blue-600 font-semibold mb-1">Monthly Savings</div>
+                <div className="text-xl font-bold text-blue-800">₹{monthlySavings.toLocaleString('en-IN')}</div>
+              </div>
+              <div className="bg-purple-50 border border-purple-100 rounded-xl p-4 text-center">
+                <div className="text-sm text-purple-600 font-semibold mb-1">Payback Period</div>
+                <div className="text-xl font-bold text-purple-800">{paybackYears} Years</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
       </div>
     </div>
-  )
+  );
 }
