@@ -14,10 +14,18 @@ export default function Dashboard() {
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white shadow-sm px-8 py-4 flex justify-between items-center">
         <div className="font-bold text-orange-500 text-xl">☀️ Surya Setu AI</div>
-        <Link href="/login">
-          <button className="text-sm text-gray-500 hover:text-red-500">Logout</button>
-        </Link>
+        <div className="flex gap-6 items-center">
+          <Link href="/profile">
+            <button className="text-sm font-semibold text-gray-600 hover:text-orange-500 flex items-center gap-2">
+              👤 Profile
+            </button>
+          </Link>
+          <Link href="/login">
+            <button className="text-sm text-gray-500 hover:text-red-500">Logout</button>
+          </Link>
+        </div>
       </div>
+      
       <div className="max-w-4xl mx-auto px-6 py-10">
         <h1 className="text-2xl font-bold text-gray-800 mb-1">Welcome back! 👋</h1>
         <p className="text-gray-500 mb-8">What would you like to do today?</p>
