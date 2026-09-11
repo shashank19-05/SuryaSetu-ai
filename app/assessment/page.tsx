@@ -18,7 +18,6 @@ export default function Assessment() {
     setIsSubmitting(true);
 
     try {
-      // If user is logged in, save to Firestore
       if (auth.currentUser) {
         await addDoc(collection(db, 'assessments'), {
           uid: auth.currentUser.uid,
@@ -27,7 +26,6 @@ export default function Assessment() {
           timestamp: new Date().toISOString()
         });
       } else {
-        // Fallback for guests
         localStorage.setItem('solarData', JSON.stringify({ bill: billAmount, area: roofArea }));
       }
       router.push('/solar-report');
@@ -56,7 +54,7 @@ export default function Assessment() {
                 required
                 value={billAmount}
                 onChange={(e) => setBillAmount(e.target.value)}
-                className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full border border-gray-300 rounded-xl p-3 text-gray-900 bg-white outline-none focus:ring-2 focus:ring-orange-500"
                 placeholder="e.g. 1500"
               />
             </div>
@@ -67,7 +65,7 @@ export default function Assessment() {
                 required
                 value={roofArea}
                 onChange={(e) => setRoofArea(e.target.value)}
-                className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full border border-gray-300 rounded-xl p-3 text-gray-900 bg-white outline-none focus:ring-2 focus:ring-orange-500"
                 placeholder="e.g. 800"
               />
             </div>
