@@ -1,46 +1,71 @@
-import Link from 'next/link'
+import Link from 'next/link';
 
-export default function Landing() {
+export default function Home() {
   return (
-    <div style={{minHeight:'100vh', background:'linear-gradient(135deg, #FACC15, #F97316, #EF4444)'}}>
-      <nav style={{display:'flex', justifyContent:'space-between', alignItems:'center', padding:'16px 32px'}}>
-        <div style={{color:'white', fontWeight:'bold', fontSize:'20px'}}>☀️ Surya Setu AI</div>
-        <Link href="/login">
-          <button style={{background:'white', color:'#F97316', fontWeight:'600', padding:'8px 20px', borderRadius:'999px', border:'none', cursor:'pointer'}}>
-            Login
-          </button>
-        </Link>
+    <div className="min-h-screen bg-gradient-to-b from-orange-50 to-white font-sans selection:bg-orange-200">
+      {/* Navigation Bar */}
+      <nav className="max-w-7xl mx-auto px-6 py-6 flex justify-between items-center">
+        <div className="text-2xl font-extrabold text-gray-900 tracking-tight flex items-center gap-2">
+          <span className="text-4xl">☀️</span> Surya Setu <span className="text-orange-500">AI</span>
+        </div>
+        <div className="flex gap-4">
+          <Link href="/login">
+            <button className="text-gray-600 font-semibold hover:text-gray-900 transition px-4 py-2">
+              Log In
+            </button>
+          </Link>
+          <Link href="/login">
+            <button className="bg-gray-900 text-white px-6 py-2 rounded-full font-bold hover:bg-gray-800 transition shadow-lg">
+              Get Started
+            </button>
+          </Link>
+        </div>
       </nav>
 
-      <div style={{display:'flex', flexDirection:'column', alignItems:'center', textAlign:'center', padding:'80px 16px'}}>
-        <div style={{fontSize:'72px', marginBottom:'24px'}}>☀️</div>
-        <h1 style={{fontSize:'48px', fontWeight:'bold', color:'white', marginBottom:'16px', lineHeight:'1.2'}}>
-          Smart Solar for<br />Every Indian Home
+      {/* Hero Section */}
+      <main className="max-w-7xl mx-auto px-6 pt-20 pb-24 text-center">
+        <div className="inline-block bg-orange-100 text-orange-700 px-4 py-1.5 rounded-full text-sm font-bold mb-6 border border-orange-200 shadow-sm">
+          🚀 Built for the PM Surya Ghar Muft Bijli Yojana
+        </div>
+        
+        <h1 className="text-5xl md:text-7xl font-extrabold text-gray-900 leading-tight mb-8">
+          Unlock Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500">Solar Potential</span> <br className="hidden md:block" /> in Seconds.
         </h1>
-        <p style={{color:'rgba(255,255,255,0.85)', fontSize:'20px', marginBottom:'40px', maxWidth:'560px'}}>
-          Find out how much you can save with solar energy. Get personalized reports, ROI calculations and connect with verified installers.
+        
+        <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto mb-10 leading-relaxed">
+          Upload your electricity bill and let our AI calculate your perfect rooftop solar setup, exact government subsidies, and total ROI. Transitioning to clean energy has never been this easy.
         </p>
-        <Link href="/login">
-          <button style={{background:'white', color:'#F97316', fontWeight:'bold', padding:'16px 40px', borderRadius:'999px', fontSize:'18px', border:'none', cursor:'pointer', boxShadow:'0 10px 30px rgba(0,0,0,0.2)'}}>
-            Get Started Free →
+        
+        <div className="flex flex-col sm:flex-row justify-center gap-4">
+          <Link href="/login">
+            <button className="bg-orange-500 text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-orange-600 transition shadow-xl hover:shadow-orange-200 hover:-translate-y-1 w-full sm:w-auto">
+              Start Free Assessment ✨
+            </button>
+          </Link>
+          <button className="bg-white text-gray-800 px-8 py-4 rounded-full font-bold text-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition shadow-sm w-full sm:w-auto">
+            View Live Demo
           </button>
-        </Link>
+        </div>
 
-        <div style={{display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:'32px', marginTop:'80px', color:'white'}}>
-          <div style={{background:'rgba(255,255,255,0.2)', borderRadius:'16px', padding:'24px'}}>
-            <div style={{fontSize:'32px', fontWeight:'bold'}}>₹0</div>
-            <div style={{fontSize:'14px', marginTop:'4px'}}>Cost to check</div>
+        {/* Feature Highlights */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-24">
+          <div className="p-6 bg-white rounded-2xl shadow-sm border border-gray-100 text-left">
+            <div className="text-3xl mb-4">📸</div>
+            <h3 className="font-bold text-xl text-gray-900 mb-2">Smart Assessment</h3>
+            <p className="text-gray-500">Upload your bill and roof photo. We analyze your exact energy needs instantly.</p>
           </div>
-          <div style={{background:'rgba(255,255,255,0.2)', borderRadius:'16px', padding:'24px'}}>
-            <div style={{fontSize:'32px', fontWeight:'bold'}}>5 min</div>
-            <div style={{fontSize:'14px', marginTop:'4px'}}>Assessment time</div>
+          <div className="p-6 bg-white rounded-2xl shadow-sm border border-gray-100 text-left">
+            <div className="text-3xl mb-4">💰</div>
+            <h3 className="font-bold text-xl text-gray-900 mb-2">Govt Subsidy Logic</h3>
+            <p className="text-gray-500">Integrated with real PM Surya Ghar formulas to calculate your ₹78,000 maximum benefit.</p>
           </div>
-          <div style={{background:'rgba(255,255,255,0.2)', borderRadius:'16px', padding:'24px'}}>
-            <div style={{fontSize:'32px', fontWeight:'bold'}}>₹78k</div>
-            <div style={{fontSize:'14px', marginTop:'4px'}}>Avg yearly savings</div>
+          <div className="p-6 bg-white rounded-2xl shadow-sm border border-gray-100 text-left">
+            <div className="text-3xl mb-4">☁️</div>
+            <h3 className="font-bold text-xl text-gray-900 mb-2">Cloud Synced</h3>
+            <p className="text-gray-500">Securely backed by Firebase. Access your personalized reports from any device.</p>
           </div>
         </div>
-      </div>
+      </main>
     </div>
-  )
+  );
 }
